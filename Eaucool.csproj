@@ -16,4 +16,10 @@
     <Optimize>False</Optimize>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="eaupak\**" />
+    <EmbeddedResource Remove="eaupak\**" />
+    <None Remove="eaupak\**" />
+  </ItemGroup>
+
 </Project>

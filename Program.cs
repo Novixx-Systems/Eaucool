@@ -9,14 +9,16 @@ namespace Eaucool
     internal class Program
     {
         public static Dictionary<string, string> variables = new Dictionary<string, string>();
-        public static Dictionary<string, int> methods = new Dictionary<string, int>(); // The int is the id of the method
-        public static Dictionary<int, string> methodCode = new Dictionary<int, string>(); // Once again, the int is the id of the method
+        public static Dictionary<string, string[]> methodCode = new Dictionary<string, string[]>();
         public static int randMax = 10;
         public static Random random = new Random();
         public static bool skipIfStmtElse = false;
         private static bool skipElseStmtB;
         public static bool skipElseStmt = false;
         public static bool doingPercent = true;
+        public static string currentFile = "";
+        public static string currentFileCode = "";
+        public static int j;
         public static void Error(string msg)
         {
             Console.WriteLine("Error: " + msg);
@@ -75,7 +77,8 @@ namespace Eaucool
             bool firstPercent;
             int ifs = 1;
             skipIfStmtElse = false;
-            for (var j = 0; j < code.Split(new char[] { '\n' }).Length; j++)
+            currentFileCode = code;
+            for (j = 0; j < code.Split(new char[] { '\n' }).Length; j++)
             {
                 string line = code.Split(new char[] { '\n' })[j].Replace("\r", "").Replace("\t", " ").Trim();
                 line = Regex.Replace(line, @"\s+", " ");
@@ -146,16 +149,18 @@ namespace Eaucool
                 {
                     if (System.IO.File.Exists(line[8..]))
                     {
+                        currentFile = line[8..];
                         ParseCOOL(System.IO.File.ReadAllText(line[8..]), true);
+                    }
+                    else if (File.Exists(Path.Combine("eaumods", line[8..] + ".eau")))
+                    {
+                        currentFile = line[8..] + ".eau";
+                        ParseCOOL(System.IO.File.ReadAllText(Path.Combine("eaumods", line[8..] + ".eau")), true);
                     }
                     else
                     {
                         Error("Cannot open " + line[8..]);
                     }
-                }
-                else if (line.StartsWith("%>"))
-                {
-                    doingPercent = false;
                 }
                 else
                 {
@@ -166,7 +171,6 @@ namespace Eaucool
                         return;
                     }
                 }
-
             }
         }
         public static void FormattedPrint(string str)
@@ -192,6 +196,7 @@ namespace Eaucool
                 Console.WriteLine("Eaucool is a programming language that is designed to be easy to use.");
             }
             Parser.Init();
+            currentFile = args[0];
             ParseCOOL(System.IO.File.ReadAllText(args[0]), false);
             if (string.Join(" ", args).Contains("--pause"))
             {

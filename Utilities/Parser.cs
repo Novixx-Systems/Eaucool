@@ -62,6 +62,51 @@ namespace Eaucool
             keywords.Add("urldecode ", Kw_Urldecode);
             keywords.Add("urlencode ", Kw_Urlencode);
             #endregion
+
+            #region Method Keywords
+            keywords.Add("method ", Kw_Method);
+            keywords.Add("stopmethod", Kw_Stopmethod);
+            keywords.Add("callmethod ", Kw_Callmethod);
+            #endregion
+        }
+
+        private static void Kw_Callmethod()
+        {
+            int oldj = Program.j;
+            Program.ParseCOOL(string.Join("\n", Program.methodCode[Utils.GetString(CodeParser.ParseLineIntoTokens(line), 1)]), true);
+            Program.j = oldj;
+        }
+
+        private static void Kw_Stopmethod()
+        {
+            // This is a placeholder, it is not used
+        }
+
+        private static void Kw_Method()
+        {
+            // Get everything after the method keyword
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string methodName = args[1];
+            // And now all the code after the method name
+            string[] lines = Utils.GetLinesAfter(Program.j);
+            // And now we add the lines (until "endmethod") to the method
+            List<string> linesList = new List<string>();
+            linesList.AddRange(lines[1..]);
+            for (int i = 0; i < linesList.Count; i++)
+            {
+                if (linesList[i].Trim() == "stopmethod")
+                {
+                    for (int j = i; j < linesList.Count; j++)
+                    {
+                        linesList.RemoveAt(j);
+                    }
+                    break;
+                }
+            }
+            lines = linesList.ToArray();
+            Program.methodCode.Add(methodName, lines);
+            // Skip the lines we just added
+            Program.j += lines.Length;
         }
 
         // Urldecode and urlencode take a variable name and a value

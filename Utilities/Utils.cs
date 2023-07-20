@@ -70,5 +70,12 @@ namespace Eaucool
             }
             return returnValue;
         }
+
+        internal static string[] GetLinesAfter(int line)
+        {
+            string[] lines = Program.currentFileCode.Split('\n');
+            int index = line;
+            return lines[index..];
+        }
     }
 }
