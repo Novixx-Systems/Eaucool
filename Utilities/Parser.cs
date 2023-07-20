@@ -61,6 +61,8 @@ namespace Eaucool
             #region Web Keywords
             keywords.Add("urldecode ", Kw_Urldecode);
             keywords.Add("urlencode ", Kw_Urlencode);
+            keywords.Add("urlget ", Kw_Urlget);
+            keywords.Add("urlpost ", Kw_Urlpost);
             #endregion
 
             #region Method Keywords
@@ -68,6 +70,40 @@ namespace Eaucool
             keywords.Add("stopmethod", Kw_Stopmethod);
             keywords.Add("callmethod ", Kw_Callmethod);
             #endregion
+        }
+
+        private static void Kw_Urlpost()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string varname = args[1];
+            string url = args[2];
+            string data = Utils.GetString(args, 3);
+
+            if (varname == string.Empty || url == string.Empty || !varname.StartsWith("$"))
+            {
+                return;
+            }
+            
+            HttpClient client = new HttpClient();
+            var c = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+            string response = client.PostAsync(url, c).Result.Content.ReadAsStringAsync().Result;
+            Program.variables[varname] = response;
+        }
+
+        private static void Kw_Urlget()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string varname = args[1];
+            string url = args[2];
+
+            if (varname == string.Empty || url == string.Empty || !varname.StartsWith("$"))
+            {
+                return;
+            }
+
+            HttpClient client = new HttpClient();
+            string response = client.GetAsync(url).Result.Content.ReadAsStringAsync().Result;
+            Program.variables[varname] = response;
         }
 
         private static void Kw_Callmethod()
