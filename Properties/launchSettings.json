@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Eaucool": {
+      "commandName": "Project",
+      "commandLineArgs": "test.eau"
+    }
+  }
+}

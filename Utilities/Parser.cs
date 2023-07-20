@@ -1,0 +1,425 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
+
+namespace Eaucool
+{
+    internal class Parser
+    {
+        private static int error = 0;
+        private static string line;
+        private static HttpListenerContext ctx;
+        
+        private readonly static Dictionary<string, Action> keywords = new();
+
+        public static void Init()
+        {
+            keywords.Clear();
+
+            // All keywords
+            //
+            // NOTE: Most keywords MUST end with a space, operators
+            // must NOT end with a space. Keywords that have no arguments
+            // should also NOT end with a space.
+            
+            #region Operators
+            keywords.Add("$=",           Op_DollarEquals);
+            keywords.Add("$",            Op_Dollar);
+            #endregion
+
+            #region Utility Keywords
+            keywords.Add("echo ", Kw_Echo);
+            keywords.Add("rndmax ", Kw_Rndmax);
+            keywords.Add("random", Kw_Random);
+            keywords.Add("existing ", Kw_Existing);
+            keywords.Add("escape ", Kw_Escape);
+            keywords.Add("replace ", Kw_Replace);
+            #endregion
+
+            #region Control Flow Keywords
+            keywords.Add("if ", Kw_If);
+            #endregion
+
+            #region Date/Time Keywords
+            keywords.Add("getdate ", Kw_Getdate);
+            #endregion
+
+            #region Mail Keywords
+            keywords.Add("mail ", Kw_Mail);
+            #endregion
+
+            #region File System Keywords
+            keywords.Add("writefile ", Kw_Writefile);
+            keywords.Add("readfile ", Kw_Readfile);
+            keywords.Add("rmfile ", Kw_Rmfile);
+            keywords.Add("deletefile ", Kw_Rmfile); // Alias for rmfile
+            keywords.Add("appendfile ", Kw_Appendfile);
+            #endregion
+
+            #region Web Keywords
+            keywords.Add("urldecode ", Kw_Urldecode);
+            keywords.Add("urlencode ", Kw_Urlencode);
+            #endregion
+        }
+
+        // Urldecode and urlencode take a variable name and a value
+        // and encode/decode the value and store it in the variable
+        public static void Kw_Urlencode()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string varname = args[1];
+            string value = Utils.GetString(args, 2);
+
+            if (varname == string.Empty || value == string.Empty || !varname.StartsWith("$"))
+            {
+                return;
+            }
+
+            varname = varname[1..];
+
+            if (Program.variables.ContainsKey(varname))
+            {
+                Program.variables[varname] = WebUtility.UrlEncode(value) ?? string.Empty;
+            }
+            else
+            {
+                Program.variables.Add(varname, WebUtility.UrlEncode(value) ?? string.Empty);
+            }
+        }
+
+        public static void Kw_Urldecode()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string varname = args[1];
+            string value = Utils.GetString(args, 2);
+
+            if (varname == string.Empty || value == string.Empty || !varname.StartsWith("$"))
+            {
+                return;
+            }
+
+            varname = varname[1..];
+
+            if (Program.variables.ContainsKey(varname))
+            {
+                Program.variables[varname] = WebUtility.UrlDecode(value);
+            }
+            else
+            {
+                Program.variables.Add(varname, WebUtility.UrlDecode(value));
+            }
+        }
+
+        private static void Kw_Random()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string varname = "_RANDOM";
+
+            if (varname == string.Empty)
+            {
+                return;
+            }
+
+            if (Program.variables.ContainsKey(varname))
+            {
+                Program.variables[varname] = Program.random.Next(0, Program.randMax).ToString();
+            }
+            else
+            {
+                Program.variables.Add(varname, Program.random.Next(0, Program.randMax).ToString());
+            }
+        }
+
+        private static void Kw_Readfile()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string filename = Utils.GetString(args, 1);
+
+            if (filename == string.Empty)
+            {
+                return;
+            }
+            if (System.IO.File.Exists(filename))
+            {
+                Program.variables["_FILE"] = System.IO.File.ReadAllText(filename);
+            }
+        }
+
+        private static void Kw_Appendfile()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string filename = Utils.GetString(args, 1);
+            string content = Utils.GetString(args, 2);
+
+            if (filename == string.Empty || content == string.Empty)
+            {
+                return;
+            }
+
+            System.IO.File.AppendAllText(filename, content);
+        }
+
+        private static void Kw_Rmfile()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string filename = Utils.GetString(args, 1);
+
+            if (filename == string.Empty)
+            {
+                return;
+            }
+            if (System.IO.File.Exists(filename))
+            {
+                System.IO.File.Delete(filename);
+            }
+        }
+
+        private static void Kw_Writefile()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string filename = Utils.GetString(args, 1);
+            string content = Utils.GetString(args, 2);
+
+            if (filename == string.Empty || content == string.Empty)
+            {
+                return;
+            }
+
+            System.IO.File.WriteAllText(filename, content);
+        }
+
+        private static void Kw_Existing()
+        {
+            // This is a special keyword that is used to check if a variable exists
+
+            string varName = CodeParser.ParseLineIntoTokens(line)[1];
+            if (!varName.StartsWith("$"))
+            {
+                return;
+            }
+            varName = varName.Substring(1); // Remove the $ from the name
+
+            if (Program.variables.ContainsKey(varName))
+            {
+                if (Program.variables.ContainsKey("_EXISTS"))
+                {
+                    Program.variables["_EXISTS"] = "true";
+                }
+                else
+                {
+                    Program.variables.Add("_EXISTS", "true");
+                }
+            }
+            else
+            {
+                if (Program.variables.ContainsKey("_EXISTS"))
+                {
+                    Program.variables["_EXISTS"] = "false";
+                }
+                else
+                {
+                    Program.variables.Add("_EXISTS", "false");
+                }
+            }
+        }
+
+        private static void Kw_Mail()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string to = Utils.GetString(args, 1);
+            string subject = Utils.GetString(args, 2);
+            string body = Utils.GetString(args, 3);
+            string from = Utils.GetString(args, 4);
+            string password = Utils.GetString(args, 5);
+            string smtp = Utils.GetString(args, 6);
+            int port = 25;
+
+            MailMessage mail = new MailMessage();
+            SmtpClient SmtpServer = new SmtpClient(smtp);
+
+            mail.From = new MailAddress(from);
+            mail.To.Add(to);
+            mail.Subject = subject;
+            mail.Body = body;
+
+            SmtpServer.Port = port;
+            SmtpServer.Credentials = new System.Net.NetworkCredential(from, password);
+
+            SmtpServer.Send(mail);
+        }
+
+        public static int Parse(string lineToParse)
+        {
+            Utils.Init();
+            line = lineToParse;
+
+            int i = 0;
+            foreach (var keyword in keywords)
+            {
+                if (line.StartsWith(keyword.Key))
+                {
+                    i++;
+                    keyword.Value();        // We can call this since it's an action
+                    if (error == 1)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+            }
+            if (i == 0)
+            {
+                return 2;
+            }
+            return 1;
+        }
+
+        #region Operators
+        public static void Op_DollarEquals()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+
+            Utils.currentChar = 2;
+            Program.FormattedPrint(Utils.GetString(args, 1));
+        }
+        public static void Op_Dollar()
+        {
+            if (line.Contains("="))        // Array or variable
+            {
+                Program.variables.Remove(line[1..].Split("=")[0].Replace(" ", "").Replace("{", ""));
+                
+                if (line[1..].Split("=")[1].Replace(" ", "").StartsWith("$"))           // Variable -> Variable
+                {
+                        Program.variables.Add(line[1..].Split("=")[0].Replace(" ", ""), Program.variables[line[1..].Replace(" ", "").Split("=")[1][1..]]);
+                        goto endOfDefine;
+                    
+                }
+                Program.variables.Add(line[1..].Split("=")[0].Replace(" ", ""), line.Split("=")[1].TrimStart());
+            }
+            else
+            {
+                Program.Error("Invalid argument for variable");
+                error = 1;
+                return;
+            }
+        endOfDefine:;
+        }
+        #endregion
+        #region Keywords
+        public static void Kw_Echo()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+
+            Utils.currentChar = 5;
+            Console.WriteLine(Utils.GetString(args, 1));
+        }
+
+        public static void Kw_Rndmax()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+
+            if (args.Length > 1)
+            {
+                Utils.currentChar = 7;
+                try
+                {
+                    Program.randMax = int.Parse(Utils.GetString(args, 1));
+                }
+                catch
+                {
+                    Program.randMax = Utils.defaultReturnValue;
+                }
+            }
+            else
+            {
+                Program.randMax = Utils.defaultReturnValue;
+            }
+        }
+
+
+        public static void Kw_If()
+        {
+
+            if (line.Contains("="))
+            {
+                string toCheck = line[3..].Split("=")[0].TrimEnd();        // Just some stuff that makes
+                                                                           // it contain the first argument
+                if (line.Substring(3, 1) == "$" && Program.IsVariable(line[4..].Split("=")[0].Trim()))
+                {
+                    Program.variables.TryGetValue(line[4..].Split("=")[0].TrimEnd(), out string varcont);
+                    toCheck = varcont;
+                }
+                string secondCheck = line[3..].Split("=")[1].TrimStart();        // The thing to compare to
+                if (line.Split("=")[1].Trim() == "NULL" && !Program.IsVariable(line[4..].Split("=")[0].Trim()))
+                {
+                    toCheck = null;
+                    secondCheck = null;
+                }
+                if (line.Split("=")[1].Trim() == "NOTHING")
+                {
+                    secondCheck = "";
+                }
+                if (line.Split("=")[1].Trim()[..1] == "$" && Program.IsVariable(line[4..].Split("=")[1].Trim()[1..]))
+                {
+                    Program.variables.TryGetValue(line[4..].Split("=")[1].Trim()[1..], out string varcont);
+                    secondCheck = varcont;
+                }
+                if (toCheck != secondCheck)
+                {
+                    Program.skipIfStmtElse = true;
+                }
+                else
+                {
+                    Program.skipElseStmt = true;
+                }
+            }
+        }
+        public static void Kw_Getdate()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            if (args.Length > 1)
+            {
+                if (Program.IsVariable(args[1]))
+                {
+                    Program.variables.Remove(args[1]);
+                }
+                Program.variables.Add(args[1], DateTime.UtcNow.ToString("yyyy-MM-dd"));
+            }
+        }
+        public static void Kw_Escape()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+
+            if (args.Length > 1 && args[1][0] == '$')
+            {
+                Program.variables[args[1][1..]] = Program.SafeEscape(Program.variables[args[1][1..]]);
+            }
+            else
+            {
+                Program.Error("Variable expected");
+                error = 1;
+                return;
+            }
+        }
+        public static void Kw_Replace()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            if (args.Length > 3 && args[1][0] == '$')
+            {
+                if (Program.IsVariable(args[1][1..]))
+                {
+                    Program.variables[args[1][1..]] = Program.variables[args[1][1..]].Replace(args[2], args[3]);
+                }
+            }
+            else
+            {
+                Program.Error("Variable expected");
+                error = 1;
+                return;
+            }
+        }
+        #endregion
+    }
+}
