@@ -147,6 +147,7 @@ namespace Eaucool
                 // Include is not part of the parser
                 else if (line.StartsWith("include "))  // Include
                 {
+                    int oldj = j;
                     if (System.IO.File.Exists(line[8..]))
                     {
                         currentFile = line[8..];
@@ -161,6 +162,7 @@ namespace Eaucool
                     {
                         Error("Cannot open " + line[8..]);
                     }
+                    j = oldj;
                 }
                 else
                 {
