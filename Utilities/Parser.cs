@@ -83,11 +83,18 @@ namespace Eaucool
             {
                 return;
             }
-            
-            HttpClient client = new HttpClient();
-            var c = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
-            string response = client.PostAsync(url, c).Result.Content.ReadAsStringAsync().Result;
-            Program.variables[varname] = response;
+            varname = varname.Substring(1);
+            try
+            {
+                HttpClient client = new HttpClient();
+                var c = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+                string response = client.PostAsync(url, c).Result.Content.ReadAsStringAsync().Result;
+                Program.variables[varname] = response;
+            }
+            catch (Exception)
+            {
+                Program.Error("Failed to POST URL");
+            }
         }
 
         private static void Kw_Urlget()
@@ -100,10 +107,17 @@ namespace Eaucool
             {
                 return;
             }
-
-            HttpClient client = new HttpClient();
-            string response = client.GetAsync(url).Result.Content.ReadAsStringAsync().Result;
-            Program.variables[varname] = response;
+            varname = varname.Substring(1);
+            try
+            {
+                HttpClient client = new HttpClient();
+                string response = client.GetAsync(url).Result.Content.ReadAsStringAsync().Result;
+                Program.variables[varname] = response;
+            }
+            catch (Exception)
+            {
+                Program.Error("Failed to GET URL");
+            }
         }
 
         private static void Kw_Callmethod()
