@@ -76,7 +76,7 @@ namespace Eaucool
         {
             string[] args = CodeParser.ParseLineIntoTokens(line);
             string varname = args[1];
-            string url = args[2];
+            string url = Utils.GetString(args, 2);
             string data = Utils.GetString(args, 3);
 
             if (varname == string.Empty || url == string.Empty || !varname.StartsWith("$"))
@@ -94,7 +94,7 @@ namespace Eaucool
         {
             string[] args = CodeParser.ParseLineIntoTokens(line);
             string varname = args[1];
-            string url = args[2];
+            string url = Utils.GetString(args, 2);
 
             if (varname == string.Empty || url == string.Empty || !varname.StartsWith("$"))
             {
