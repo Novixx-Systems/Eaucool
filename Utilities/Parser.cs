@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -56,6 +57,7 @@ namespace Eaucool
             keywords.Add("rmfile ", Kw_Rmfile);
             keywords.Add("deletefile ", Kw_Rmfile); // Alias for rmfile
             keywords.Add("appendfile ", Kw_Appendfile);
+            keywords.Add("execute ", Kw_Execute);
             #endregion
 
             #region Web Keywords
@@ -70,6 +72,27 @@ namespace Eaucool
             keywords.Add("stopmethod", Kw_Stopmethod);
             keywords.Add("callmethod ", Kw_Callmethod);
             #endregion
+        }
+
+        private static void Kw_Execute()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string command = Utils.GetString(args, 1);
+            string arguments = Utils.GetString(args, 2);
+
+            if (command == string.Empty)
+            {
+                return;
+            }
+
+            try
+            {
+                Process.Start(command, arguments);
+            }
+            catch (FileNotFoundException)
+            {
+                Program.Error("File not found");
+            }
         }
 
         private static void Kw_Urlpost()

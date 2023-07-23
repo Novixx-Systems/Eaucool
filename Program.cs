@@ -19,6 +19,7 @@ namespace Eaucool
         public static string currentFile = "";
         public static string currentFileCode = "";
         public static int j;
+        public static string version = "1.2.0";
         public static void Error(string msg)
         {
             Console.WriteLine("Error: " + msg);
@@ -194,6 +195,8 @@ namespace Eaucool
             {
                 Console.WriteLine("Eaucool Programming Language (previously percentCool) - (c) 2023 Novixx Systems and Contributors");
                 Console.WriteLine("Licensed under GNU GPL v3.0");
+                Console.WriteLine();
+                Console.WriteLine("Version " + version);
                 Console.WriteLine();
                 Console.WriteLine("Eaucool is a programming language that is designed to be easy to use.");
             }

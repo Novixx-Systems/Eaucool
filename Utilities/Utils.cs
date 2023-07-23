@@ -63,6 +63,7 @@ namespace Eaucool
             catch
             {
                 returnValue = "";
+                Program.Error("Not enough arguments for statement");
             }
             foreach (string var in Program.variables.Keys)
             {
