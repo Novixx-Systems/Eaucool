@@ -87,7 +87,7 @@ namespace Eaucool
 
             try
             {
-                Process.Start(command, arguments);
+                Process.Start(command, arguments).WaitForExit();
             }
             catch (FileNotFoundException)
             {
