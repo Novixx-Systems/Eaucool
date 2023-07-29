@@ -67,13 +67,152 @@ namespace Eaucool
             keywords.Add("urlpost ", Kw_Urlpost);
             #endregion
 
+            #if Windows
+            #region GUI Keywords
+            keywords.Add("newgui ", Kw_Newgui);
+            keywords.Add("addbutton ", Kw_Addbutton);
+            keywords.Add("addlabel ", Kw_Addlabel);
+            keywords.Add("addtextbox ", Kw_Addtextbox);
+            #endregion
+            #endif
+
             #region Method Keywords
             keywords.Add("method ", Kw_Method);
             keywords.Add("stopmethod", Kw_Stopmethod);
             keywords.Add("callmethod ", Kw_Callmethod);
             #endregion
         }
+#if Windows
+        private static void Kw_Addtextbox()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string x = Utils.GetString(args, 1);
+            string y = Utils.GetString(args, 2);
+            string width = Utils.GetString(args, 3);
+            string height = Utils.GetString(args, 4);
+            string method = Utils.GetString(args, 5);
 
+            if (x == string.Empty || y == string.Empty || width == string.Empty || height == string.Empty || method == string.Empty)
+            {
+                return;
+            }
+
+            // Check if we are on Windows
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                Program.Error("GUIs are only supported on Windows");
+                return;
+            }
+
+            // Create the textbox
+            TextBox textbox = new TextBox();
+            textbox.Left = int.Parse(x);
+            textbox.Top = int.Parse(y);
+            textbox.Width = int.Parse(width);
+            textbox.Height = int.Parse(height);
+            textbox.TextChanged += (sender, e) =>
+            {
+                Program.methodCode[method] = textbox.Text.Split('\n');
+            };
+            Program.form.Controls.Add(textbox);
+        }
+
+        private static void Kw_Addlabel()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string text = Utils.GetString(args, 1);
+            string x = Utils.GetString(args, 2);
+            string y = Utils.GetString(args, 3);
+            string width = Utils.GetString(args, 4);
+            string height = Utils.GetString(args, 5);
+
+            if (text == string.Empty || x == string.Empty || y == string.Empty || width == string.Empty || height == string.Empty)
+            {
+                return;
+            }
+
+            // Check if we are on Windows
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                Program.Error("GUIs are only supported on Windows");
+                return;
+            }
+
+            // Create the label
+            Label label = new Label();
+            label.Text = text;
+            label.Left = int.Parse(x);
+            label.Top = int.Parse(y);
+            label.Width = int.Parse(width);
+            label.Height = int.Parse(height);
+            Program.form.Controls.Add(label);
+        }
+
+        private static void Kw_Addbutton()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string text = Utils.GetString(args, 1);
+            string x = Utils.GetString(args, 2);
+            string y = Utils.GetString(args, 3);
+            string width = Utils.GetString(args, 4);
+            string height = Utils.GetString(args, 5);
+            string method = Utils.GetString(args, 6);
+
+            if (text == string.Empty || x == string.Empty || y == string.Empty || width == string.Empty || height == string.Empty || method == string.Empty)
+            {
+                return;
+            }
+
+            // Check if we are on Windows
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                Program.Error("GUIs are only supported on Windows");
+                return;
+            }
+
+            // Create the button
+            Button button = new Button();
+            button.Text = text;
+            button.Left = int.Parse(x);
+            button.Top = int.Parse(y);
+            button.Width = int.Parse(width);
+            button.Height = int.Parse(height);
+            button.Click += (sender, e) =>
+            {
+                int oldj = Program.j;
+                Program.ParseCOOL(string.Join("\n", Program.methodCode[method]), true);
+                Program.j = oldj;
+            };
+            Program.form.Controls.Add(button);
+        }
+
+        private static void Kw_Newgui()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string title = Utils.GetString(args, 1);
+            string width = Utils.GetString(args, 2);
+            string height = Utils.GetString(args, 3);
+
+            if (title == string.Empty || width == string.Empty || height == string.Empty)
+            {
+                return;
+            }
+
+            // Check if we are on Windows
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                Program.Error("GUIs are only supported on Windows");
+                return;
+            }
+
+            // Create the form
+            Program.form = new Form();
+            Program.form.Text = title;
+            Program.form.Width = int.Parse(width);
+            Program.form.Height = int.Parse(height);
+            Program.form.Show();
+        }
+#endif
         private static void Kw_Execute()
         {
             string[] args = CodeParser.ParseLineIntoTokens(line);
@@ -87,7 +226,7 @@ namespace Eaucool
 
             try
             {
-                Process.Start(command, arguments).WaitForExit();
+                Process.Start(command, arguments).WaitForExit(-1);
             }
             catch (FileNotFoundException)
             {

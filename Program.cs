@@ -8,6 +8,9 @@ namespace Eaucool
     // Eaucool Programming Language - Licensed under GNU GPL v3.0
     internal class Program
     {
+        #if Windows
+            public static Form form;
+        #endif
         public static Dictionary<string, string> variables = new Dictionary<string, string>();
         public static Dictionary<string, string[]> methodCode = new Dictionary<string, string[]>();
         public static int randMax = 10;
@@ -207,6 +210,11 @@ namespace Eaucool
             {
                 Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
+            }
+
+            while (form.Visible)
+            {
+                Application.DoEvents();
             }
         }
 
