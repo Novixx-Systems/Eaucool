@@ -146,6 +146,7 @@ namespace Eaucool
             label.Width = int.Parse(width);
             label.Height = int.Parse(height);
             Program.form.Controls.Add(label);
+            label.BringToFront();
         }
 
         private static void Kw_Addbutton()
