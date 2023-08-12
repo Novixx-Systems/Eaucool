@@ -22,7 +22,7 @@ namespace Eaucool
         public static string currentFile = "";
         public static string currentFileCode = "";
         public static int j;
-        public static string version = "1.2.1";
+        public static string version = "1.2.2";
         public static void Error(string msg)
         {
             Console.WriteLine("Error: " + msg);

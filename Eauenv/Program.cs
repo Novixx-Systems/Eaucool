@@ -55,7 +55,7 @@ namespace Eauenv
             }
             Console.Clear();
             // Start shell
-            Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".eauenv", envName, "shell.bat"));
+            Process.Start("cmd.exe", "/k " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".eauenv", envName, "shell.bat"));
         }
     }
 }

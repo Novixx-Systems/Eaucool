@@ -22,8 +22,11 @@
 		<UseWindowsForms>true</UseWindowsForms>
 	</PropertyGroup>
 	<ItemGroup>
+		<Compile Remove="Eauenv\**" />
 		<Compile Remove="eaupak\**" />
+		<EmbeddedResource Remove="Eauenv\**" />
 		<EmbeddedResource Remove="eaupak\**" />
+		<None Remove="Eauenv\**" />
 		<None Remove="eaupak\**" />
 	</ItemGroup>
 	<ItemGroup>
