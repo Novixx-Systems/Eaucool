@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
 
 namespace Eaucool
 {
@@ -37,6 +38,10 @@ namespace Eaucool
             keywords.Add("existing ", Kw_Existing);
             keywords.Add("escape ", Kw_Escape);
             keywords.Add("replace ", Kw_Replace);
+            keywords.Add("rereplace ", Kw_Rereplace);
+            keywords.Add("regexreplace ", Kw_Rereplace); // Alias for rereplace
+            keywords.Add("increment ", Kw_Increment);
+            keywords.Add("decrement ", Kw_Decrement);
             #endregion
 
             #region Control Flow Keywords
@@ -81,6 +86,93 @@ namespace Eaucool
             keywords.Add("stopmethod", Kw_Stopmethod);
             keywords.Add("callmethod ", Kw_Callmethod);
             #endregion
+        }
+
+        private static void Kw_Decrement()
+        {
+            // Decrement a variable by 1
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string variable = Utils.GetString(args, 1);
+            
+            if (variable == string.Empty)
+            {
+                return;
+            }
+
+            if (!variable.StartsWith("$"))
+            {
+                Program.Error("Variable names must start with a $");
+            }
+
+            if (!Program.variables.ContainsKey(variable))
+            {
+                Program.variables.Add(variable, "0");
+            }
+
+            int test;
+            if (!int.TryParse(Program.variables[variable], out test))
+            {
+                Program.Error("Variable must be an integer");
+            }
+
+            Program.variables[variable] = (int.Parse(Program.variables[variable]) - 1).ToString();
+        }
+
+        private static void Kw_Increment()
+        {
+            // Increment a variable by 1
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string variable = Utils.GetString(args, 1);
+            
+            if (variable == string.Empty)
+            {
+                return;
+            }
+
+            if (!variable.StartsWith("$"))
+            {
+                Program.Error("Variable names must start with a $");
+            }
+
+            if (!Program.variables.ContainsKey(variable))
+            {
+                Program.variables.Add(variable, "0");
+            }
+
+            int test;
+            if (!int.TryParse(Program.variables[variable], out test))
+            {
+                Program.Error("Variable must be an integer");
+            }
+
+            Program.variables[variable] = (int.Parse(Program.variables[variable]) + 1).ToString();
+        }
+
+        private static void Kw_Rereplace()
+        {
+            // Replace a string with a regex
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string variable = Utils.GetString(args, 1);
+            string input = Utils.GetString(args, 2);
+            string pattern = Utils.GetString(args, 3);
+            string replacement = Utils.GetString(args, 4);
+
+            if (input == string.Empty || pattern == string.Empty || replacement == string.Empty)
+            {
+                return;
+            }
+
+            if (!variable.StartsWith("$"))
+            {
+                Program.Error("Variable names must start with a $");
+            }
+
+            if (!Program.variables.ContainsKey(variable))
+            {
+                Program.variables.Add(variable, string.Empty);
+            }
+
+            Program.variables[variable] = Regex.Replace(input, pattern, replacement);
         }
 #if Windows
         private static void Kw_Addtextbox()
