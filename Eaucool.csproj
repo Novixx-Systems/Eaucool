@@ -26,5 +26,8 @@
 		<EmbeddedResource Remove="eaupak\**" />
 		<None Remove="eaupak\**" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="eaupak\eaupak.csproj" />
+	</ItemGroup>
 
 </Project>
