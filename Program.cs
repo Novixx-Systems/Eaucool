@@ -211,7 +211,7 @@ namespace Eaucool
                 Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
             }
-
+            if (form == null) return;
             while (form.Visible)
             {
                 Application.DoEvents();

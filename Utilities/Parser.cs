@@ -92,7 +92,7 @@ namespace Eaucool
         {
             // Decrement a variable by 1
             string[] args = CodeParser.ParseLineIntoTokens(line);
-            string variable = Utils.GetString(args, 1);
+            string variable = args[1];
             
             if (variable == string.Empty)
             {
@@ -103,6 +103,7 @@ namespace Eaucool
             {
                 Program.Error("Variable names must start with a $");
             }
+            variable = variable.Substring(1);
 
             if (!Program.variables.ContainsKey(variable))
             {
@@ -122,7 +123,7 @@ namespace Eaucool
         {
             // Increment a variable by 1
             string[] args = CodeParser.ParseLineIntoTokens(line);
-            string variable = Utils.GetString(args, 1);
+            string variable = args[1];
             
             if (variable == string.Empty)
             {
@@ -133,6 +134,7 @@ namespace Eaucool
             {
                 Program.Error("Variable names must start with a $");
             }
+            variable = variable.Substring(1);
 
             if (!Program.variables.ContainsKey(variable))
             {
@@ -152,20 +154,18 @@ namespace Eaucool
         {
             // Replace a string with a regex
             string[] args = CodeParser.ParseLineIntoTokens(line);
-            string variable = Utils.GetString(args, 1);
+            string variable = args[1];
             string input = Utils.GetString(args, 2);
             string pattern = Utils.GetString(args, 3);
             string replacement = Utils.GetString(args, 4);
 
-            if (input == string.Empty || pattern == string.Empty || replacement == string.Empty)
-            {
-                return;
-            }
 
             if (!variable.StartsWith("$"))
             {
                 Program.Error("Variable names must start with a $");
             }
+
+            variable = variable.Substring(1);
 
             if (!Program.variables.ContainsKey(variable))
             {

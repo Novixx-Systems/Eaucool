@@ -5,7 +5,9 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eaucool", "Eaucool.csproj", "{68D13A82-41A1-433A-A1DB-7DAED73F3422}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eaupak", "eaupak\eaupak.csproj", "{1E598134-FBC4-4493-BDAC-584EAE8A6270}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eaupak", "eaupak\eaupak.csproj", "{1E598134-FBC4-4493-BDAC-584EAE8A6270}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eauenv", "..\Eauenv\Eauenv.csproj", "{D564E921-45E1-45D6-A42B-D72692C97E24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{1E598134-FBC4-4493-BDAC-584EAE8A6270}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1E598134-FBC4-4493-BDAC-584EAE8A6270}.Release|x64.ActiveCfg = Release|Any CPU
 		{1E598134-FBC4-4493-BDAC-584EAE8A6270}.Release|x64.Build.0 = Release|Any CPU
+		{D564E921-45E1-45D6-A42B-D72692C97E24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D564E921-45E1-45D6-A42B-D72692C97E24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D564E921-45E1-45D6-A42B-D72692C97E24}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D564E921-45E1-45D6-A42B-D72692C97E24}.Debug|x64.Build.0 = Debug|Any CPU
+		{D564E921-45E1-45D6-A42B-D72692C97E24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D564E921-45E1-45D6-A42B-D72692C97E24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D564E921-45E1-45D6-A42B-D72692C97E24}.Release|x64.ActiveCfg = Release|Any CPU
+		{D564E921-45E1-45D6-A42B-D72692C97E24}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
