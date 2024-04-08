@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
+using Eaucool.Utilities;
 
 namespace Eaucool
 {

@@ -1,4 +1,4 @@
-﻿namespace Eaucool
+﻿namespace Eaucool.Utilities
 {
     internal class Special
     {

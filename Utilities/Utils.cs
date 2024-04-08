@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Eaucool
+namespace Eaucool.Utilities
 {
     internal static class Utils
     {

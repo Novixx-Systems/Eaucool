@@ -2,7 +2,7 @@
   "profiles": {
     "Eaucool": {
       "commandName": "Project",
-      "commandLineArgs": "test.eau"
+      "commandLineArgs": "c:\\users\\mmp\\source\\repos\\eaucool\\bin\\release\\net6.0-windows\\publish\\win-x64\\neural.eau"
     }
   }
 }

@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 
-namespace Eaucool
+namespace Eaucool.Utilities
 {
     internal class Parser
     {
@@ -43,6 +43,7 @@ namespace Eaucool
             keywords.Add("increment ", Kw_Increment);
             keywords.Add("decrement ", Kw_Decrement);
             keywords.Add("throw ", Kw_Throw);
+            keywords.Add("compute ", Kw_Compute);
             #endregion
 
             #region Control Flow Keywords
@@ -131,6 +132,26 @@ namespace Eaucool
             }
 
             Program.variables[variable] = (int.Parse(Program.variables[variable]) - 1).ToString();
+        }
+
+        private static void Kw_Compute()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string expression = Utils.GetString(args, 1);
+
+            if (expression == string.Empty)
+            {
+                return;
+            }
+
+            try
+            {
+                Program.variables["_RESULT"] = MathParser.Parse(expression);
+            }
+            catch (Exception)
+            {
+                Program.Error("Failed to compute expression");
+            }
         }
 
         private static void Kw_Increment()
@@ -650,15 +671,31 @@ namespace Eaucool
         }
         public static void Op_Dollar()
         {
+            // Arrays in Eaucool are defined like this:
+            // $array = "value1|value2|value3"
+            // You need to escape the | character if you want to use it in a string
             if (line.Contains("="))        // Array or variable
             {
-                Program.variables.Remove(line[1..].Split("=")[0].Replace(" ", "").Replace("{", ""));
+                string fixede = line[1..].Split("=")[0].Replace(" ", "").Replace("{", "");
+                //Program.variables.Remove(line[1..].Split("=")[0].Replace(" ", "").Replace("{", ""));
+                if (Program.variables.ContainsKey(fixede))
+                {
+                    Program.variables.Remove(fixede);
+                }
                 
                 if (line[1..].Split("=")[1].Replace(" ", "").StartsWith("$"))           // Variable -> Variable
                 {
+                    try
+                    {
                         Program.variables.Add(line[1..].Split("=")[0].Replace(" ", ""), Program.variables[line[1..].Replace(" ", "").Split("=")[1][1..]]);
-                        goto endOfDefine;
-                    
+                        return;
+                    }
+                    catch
+                    {
+                        Program.Error("Internal error -- variable not found");
+                        error = 1;
+                        return;
+                    }
                 }
                 Program.variables.Add(line[1..].Split("=")[0].Replace(" ", ""), line.Split("=")[1].TrimStart());
             }
@@ -668,7 +705,6 @@ namespace Eaucool
                 error = 1;
                 return;
             }
-        endOfDefine:;
         }
         #endregion
         #region Keywords
