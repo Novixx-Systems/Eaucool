@@ -29,8 +29,5 @@
 		<None Remove="Eauenv\**" />
 		<None Remove="eaupak\**" />
 	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="eaupak\eaupak.csproj" />
-	</ItemGroup>
 
 </Project>

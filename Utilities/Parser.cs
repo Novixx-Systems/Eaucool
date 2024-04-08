@@ -42,6 +42,7 @@ namespace Eaucool
             keywords.Add("regexreplace ", Kw_Rereplace); // Alias for rereplace
             keywords.Add("increment ", Kw_Increment);
             keywords.Add("decrement ", Kw_Decrement);
+            keywords.Add("throw ", Kw_Throw);
             #endregion
 
             #region Control Flow Keywords
@@ -86,6 +87,19 @@ namespace Eaucool
             keywords.Add("stopmethod", Kw_Stopmethod);
             keywords.Add("callmethod ", Kw_Callmethod);
             #endregion
+        }
+
+        private static void Kw_Throw()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string message = Utils.GetString(args, 1);
+
+            if (message == string.Empty)
+            {
+                Program.Error("throw requires a non-empty message");
+            }
+
+            Program.Error(message);
         }
 
         private static void Kw_Decrement()
