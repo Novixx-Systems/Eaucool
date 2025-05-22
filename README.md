@@ -18,3 +18,14 @@ echo "Hello World!"
 newgui "Eaucool GUI" 800 600
 addlabel "Hello, World!" 0 0 100 100
 ```
+
+## Conditionals
+```
+$hello = Hello, World!
+echo $hello
+if $hello = Hello, World!
+    echo "The variable contains the value"
+else
+    echo "The variable does not contain the value"
+stopif
+```
