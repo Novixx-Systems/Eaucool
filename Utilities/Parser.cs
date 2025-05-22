@@ -72,7 +72,7 @@ namespace Eaucool.Utilities
             keywords.Add("urlencode ", Kw_Urlencode);
             keywords.Add("urlget ", Kw_Urlget);
             keywords.Add("urlpost ", Kw_Urlpost);
-            keywords.Add("httpserve", Kw_Httpserve);
+            keywords.Add("httpserve ", Kw_Httpserve);
             #endregion
 
 #if Windows
