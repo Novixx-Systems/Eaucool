@@ -72,9 +72,10 @@ namespace Eaucool.Utilities
             keywords.Add("urlencode ", Kw_Urlencode);
             keywords.Add("urlget ", Kw_Urlget);
             keywords.Add("urlpost ", Kw_Urlpost);
+            keywords.Add("httpserve", Kw_Httpserve);
             #endregion
 
-            #if Windows
+#if Windows
             #region GUI Keywords
             keywords.Add("newgui ", Kw_Newgui);
             keywords.Add("addbutton ", Kw_Addbutton);
@@ -497,6 +498,64 @@ namespace Eaucool.Utilities
             }
         }
 
+        private static void Kw_Httpserve()
+        {
+            string[] args = CodeParser.ParseLineIntoTokens(line);
+            string port = Utils.GetString(args, 1);
+            string method = Utils.GetString(args, 2); // method called every time a request is made
+            if (port == string.Empty || method == string.Empty)
+            {
+                return;
+            }
+
+            HttpListener listener = new HttpListener();
+            if (Utils.IsAdmin())
+            {
+                listener.Prefixes.Add($"http://*:{port}/");
+            }
+            else
+            {
+                listener.Prefixes.Add($"http://localhost:{port}/");
+            }
+
+            Thread listenerThread = new Thread(() =>
+            {
+                listener.Start();
+                while (true)
+                {
+                    HttpListenerContext context = listener.GetContext();
+                    ctx = context;
+                    string methodName = Utils.GetString(args, 2);
+                    Program.variables["_REQUEST_URL"] = context.Request.RawUrl;
+                    Program.variables["_REQUEST_METHOD"] = context.Request.HttpMethod;
+                    Program.variables["_REQUEST_CONTENT"] = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding).ReadToEnd();
+                    Program.variables["_REQUEST_COOKIES"] = context.Request.Headers["Cookie"];
+                    Program.variables["_REQUEST_USERAGENT"] = context.Request.UserAgent;
+                    Program.variables["_REQUEST_IP"] = context.Request.RemoteEndPoint.Address.ToString();
+                    Program.ParseCOOL(string.Join("\n", Program.methodCode[methodName]), true);
+                    context.Response.StatusCode = Program.variables.ContainsKey("_REQUEST_STATUS") ? int.Parse(Program.variables["_REQUEST_STATUS"]) : 404;
+                    context.Response.StatusDescription = "OK";
+                    context.Response.ContentType = "text/plain";
+                    string output = Program.variables.ContainsKey("_REQUEST_RESPONSE") ? Program.variables["_REQUEST_RESPONSE"] : (context.Response.StatusCode.ToString() + " Not Found");
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(output);
+                    context.Response.ContentLength64 = buffer.Length;
+                    context.Response.OutputStream.Write(buffer, 0, buffer.Length);
+                    context.Response.OutputStream.Close();
+                    Program.variables.Remove("_REQUEST_URL");
+                    Program.variables.Remove("_REQUEST_METHOD");
+                    Program.variables.Remove("_REQUEST_CONTENT");
+                    Program.variables.Remove("_REQUEST_COOKIES");
+                    Program.variables.Remove("_REQUEST_USERAGENT");
+                    Program.variables.Remove("_REQUEST_IP");
+                    ctx.Response.Close();
+                }
+            });
+
+            listenerThread.Start();
+            Program.variables["_HTTP_RUNNING"] = "true";
+            Program.variables["_HTTP_PORT"] = port;
+        }
+
         private static void Kw_Random()
         {
             string[] args = CodeParser.ParseLineIntoTokens(line);
@@ -697,7 +756,12 @@ namespace Eaucool.Utilities
                         return;
                     }
                 }
-                Program.variables.Add(line[1..].Split("=")[0].Replace(" ", ""), line.Split("=")[1].TrimStart());
+                string newContent = line.Split("=")[1].TrimStart();
+                foreach (string var in Program.variables.Keys)
+                {
+                    newContent = newContent.ReplaceWord("$" + var, Program.variables[var]);
+                }
+                Program.variables.Add(line[1..].Split("=")[0].Replace(" ", ""), newContent);
             }
             else
             {

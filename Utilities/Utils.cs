@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -51,6 +52,20 @@ namespace Eaucool.Utilities
             if (sb == null) return text;
             sb.Append(text, p, text.Length - p);
             return sb.ToString();
+        }
+        // Chrck if running with elevated privileges
+        public static bool IsAdmin()
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                WindowsIdentity identity = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            else
+            {
+                return true; // Linux and MacOS don't have the same concept of admin privileges AFAIK
+            }
         }
         public static string GetString(string[] args, int arg = 0, bool noSpace = true)
         {

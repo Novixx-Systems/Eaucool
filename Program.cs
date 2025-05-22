@@ -147,6 +147,10 @@ namespace Eaucool
                 else if (line == "else")
                 {
                 }
+                else if (line == "stop")
+                {
+                    return;
+                }
                 // Include is not part of the parser
                 else if (line.StartsWith("include "))  // Include
                 {
