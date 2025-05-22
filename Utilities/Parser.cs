@@ -535,7 +535,7 @@ namespace Eaucool.Utilities
                     Program.ParseCOOL(string.Join("\n", Program.methodCode[methodName]), true);
                     context.Response.StatusCode = Program.variables.ContainsKey("_REQUEST_STATUS") ? int.Parse(Program.variables["_REQUEST_STATUS"]) : 404;
                     context.Response.StatusDescription = "OK";
-                    context.Response.ContentType = "text/plain";
+                    context.Response.ContentType = "text/html";
                     string output = Program.variables.ContainsKey("_REQUEST_RESPONSE") ? Program.variables["_REQUEST_RESPONSE"] : (context.Response.StatusCode.ToString() + " Not Found");
                     byte[] buffer = System.Text.Encoding.UTF8.GetBytes(output);
                     context.Response.ContentLength64 = buffer.Length;
