@@ -97,10 +97,8 @@ namespace Eaucool
                         }
                         if (line == "else")
                         {
-                            if (ifs <= 0)
-                            {
-                                skipIfStmtElse = false; // endif
-                            }
+                            skipIfStmtElse = false;
+                            skipElseStmt = true;
                         }
                         else if (line == "stopif")
                         {
@@ -190,14 +188,14 @@ namespace Eaucool
             if (args.Length == 0)
             {
                 // No arguments
-                Console.WriteLine("Eaucool Programming Language - (c) 2024 Novixx Systems and Contributors");
+                Console.WriteLine("Eaucool Programming Language - (c) 2023-2025 Novixx Systems and Contributors");
                 Console.WriteLine("Usage: eaucool <filename>");
                 Console.WriteLine("Example: eaucool hello.eau");
                 return;
             }
             if (args[0] == "--about")  // About screen, which shows the previous name of the language :)
             {
-                Console.WriteLine("Eaucool Programming Language (previously percentCool) - (c) 2024 Novixx Systems and Contributors");
+                Console.WriteLine("Eaucool Programming Language (previously percentCool) - (c) 2023-2025 Novixx Systems and Contributors");
                 Console.WriteLine("Licensed under GNU GPL v3.0");
                 Console.WriteLine();
                 Console.WriteLine("Version " + version);
