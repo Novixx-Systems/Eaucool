@@ -26,7 +26,9 @@ namespace Eaucool
         public static string version = "1.2.3";
         public static void Error(string msg)
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Error: " + msg);
+            Console.ResetColor();
             Environment.Exit(1);
         }
         public static string pageData

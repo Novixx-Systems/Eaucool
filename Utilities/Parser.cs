@@ -736,30 +736,15 @@ namespace Eaucool.Utilities
             if (line.Contains("="))        // Array or variable
             {
                 string fixede = line[1..].Split("=")[0].Replace(" ", "").Replace("{", "");
-                //Program.variables.Remove(line[1..].Split("=")[0].Replace(" ", "").Replace("{", ""));
-                if (Program.variables.ContainsKey(fixede))
-                {
-                    Program.variables.Remove(fixede);
-                }
-                
-                if (line[1..].Split("=")[1].Replace(" ", "").StartsWith("$"))           // Variable -> Variable
-                {
-                    try
-                    {
-                        Program.variables.Add(line[1..].Split("=")[0].Replace(" ", ""), Program.variables[line[1..].Replace(" ", "").Split("=")[1][1..]]);
-                        return;
-                    }
-                    catch
-                    {
-                        Program.Error("Internal error -- variable not found");
-                        error = 1;
-                        return;
-                    }
-                }
                 string newContent = line.Split("=")[1].TrimStart();
                 foreach (string var in Program.variables.Keys)
                 {
                     newContent = newContent.ReplaceWord("$" + var, Program.variables[var]);
+                }
+                //Program.variables.Remove(line[1..].Split("=")[0].Replace(" ", "").Replace("{", ""));
+                if (Program.variables.ContainsKey(fixede))
+                {
+                    Program.variables.Remove(fixede);
                 }
                 Program.variables.Add(line[1..].Split("=")[0].Replace(" ", ""), newContent);
             }
