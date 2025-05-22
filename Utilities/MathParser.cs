@@ -15,7 +15,7 @@ namespace Eaucool.Utilities
             string minus = "-";
             string multiply = "*";
             string divide = "/";
-            string xor = "^";
+            string power = "^";
             string[] expressionArray = expression.Split(' ');
             for (int i = 0; i < expressionArray.Length; i++)
             {
@@ -35,7 +35,7 @@ namespace Eaucool.Utilities
                 {
                     output += double.Parse(expressionArray[i - 1]) / double.Parse(expressionArray[i + 1]);
                 }
-                else if (expressionArray[i] == xor)
+                else if (expressionArray[i] == power)
                 {
                     output += Math.Pow(double.Parse(expressionArray[i - 1]), double.Parse(expressionArray[i + 1]));
                 }
