@@ -23,7 +23,7 @@ namespace Eaucool
         public static string currentFile = "";
         public static string currentFileCode = "";
         public static int j;
-        public static string version = "1.2.3";
+        public static string version = "1.2.4";
         public static void Error(string msg)
         {
             Console.ForegroundColor = ConsoleColor.Red;
