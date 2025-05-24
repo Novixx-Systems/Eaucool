@@ -59,10 +59,11 @@ namespace Eauenv
             ProcessStartInfo startInfo = new ProcessStartInfo();
             #if WINDOWS
             startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = "/K " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".eauenv", envName, "shell");
 #else
             startInfo.FileName = "bash";
+            startInfo.Arguments = "-c \"source " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".eauenv", envName, "shell.sh") + " && exec bash\"";
 #endif
-            startInfo.Arguments = "/K " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".eauenv", envName, "shell");
             startInfo.UseShellExecute = true;
             // Make it a window
             startInfo.WindowStyle = ProcessWindowStyle.Normal;

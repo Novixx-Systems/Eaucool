@@ -8,14 +8,14 @@ namespace eaupak
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: eaupak <package name>");
+                Console.WriteLine("Usage: eaupak <package name[x.y.z]>");
                 return;
             }
             // Get the package name
             string packageName = args[0];
             // Check if the package exists
             HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync("https://raw.githubusercontent.com/Novixx-Systems/eaucool-packages/main/" + packageName + ".eau");
+            HttpResponseMessage response = await client.GetAsync("https://eau.cool/packages/" + packageName + ".eau");
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 Console.WriteLine("Package not found");
